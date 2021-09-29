@@ -32,17 +32,28 @@ export default {
 </template>
 <style lang="scss" scoped>
 .card {
-  width: 20%;
   height: 400px;
   margin-bottom: 30px;
-  border: 1px solid #000;
-  border-radius: 8px;
+  border: 2px solid rgba(128, 128, 128, 0.452);
+  border-radius: 5px;
   overflow: hidden;
+  box-sizing: border-box;
+  margin-right: 5%;
+  flex-basis: 20%;
+  transition: 0.3s;
+  cursor: pointer;
+  box-shadow: 0px 0px 3px 5px rgba(68, 66, 66, 0.11),
+    0px 0px 5px 10px rgba(128, 128, 128, 0.137);
+  &:hover {
+    transform: perspective(300px) translateZ(10px);
+    box-shadow: 0px 0px 20px 30px rgba(128, 128, 128, 0.137);
+  }
+
   .bg {
     width: 100%;
     height: 50%;
     background-size: cover;
-    background-position: center center;
+    background-position: 50% 50%;
     background-repeat: no-repeat;
     position: relative;
     background-color: rgb(179, 179, 179);
@@ -51,7 +62,7 @@ export default {
   .text {
     height: 50%;
     h1 {
-      font-size: 25px;
+      font-size: 20px;
       margin-left: 5%;
     }
   }
