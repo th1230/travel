@@ -1,5 +1,5 @@
 <script>
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, watch, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import Card from "@/components/Card.vue";
 import Button from "@/components/Button.vue";
@@ -16,26 +16,67 @@ export default {
     const Data = reactive({ data: [] });
     const totalDataCount = ref(0);
     const totalPageCount = ref(0);
+
     let currentPage = ref(1);
     let currentActive = ref(1);
     let stuffCount = ref(0);
 
     onMounted(() => {
-      store.dispatch("getApiData", 1).then((res) => {
+      store.dispatch("getApiData", { index: 1, id: null }).then((res) => {
         Data.data = res;
         totalDataCount.value = store.state.totalCount;
-        totalPageCount.value = Math.floor(store.state.totalNum / 20) + 1;
+        totalPageCount.value = Math.ceil(store.state.viewPoints.length / 20);
 
         let allButton = document.querySelector(".button");
         allButton.classList.add("active");
-
-        for (let i = 2; i < totalDataCount.value + 1; i++) {
-          store.dispatch("loadOtherApiData", i);
-          totalDataCount.value = store.state.totalCount;
-          totalPageCount.value = Math.floor(store.state.totalNum / 20) + 1;
-        }
+        loadOtherData();
       });
     });
+
+    watch(
+      () => store.state.currentData,
+      async (newValue, oldValue) => {
+        Data.data = store.getters.getCurrentData;
+        totalDataCount.value = store.state.totalCount;
+
+        if (store.state.viewPoints.length <= 20) {
+          totalPageCount.value = 1;
+        } else {
+          totalPageCount.value = Math.ceil(store.state.viewPoints.length / 20);
+        }
+
+        let currentId = await getId();
+
+        currentPage.value = 1;
+        currentActive.value = 1;
+        stuffCount.value = 0;
+
+        await loadOtherData(currentId);
+      },
+      { deep: true }
+    );
+
+    watch(
+      () => store.state.viewPoints,
+      (newValue, oldValue) => {
+        if (store.state.totalNum <= 20) {
+          totalPageCount.value = 1;
+        } else {
+          totalPageCount.value = Math.ceil(store.state.viewPoints.length / 20);
+          console.log(totalPageCount.value);
+        }
+      }
+    );
+
+    function loadOtherData(id = null) {
+      for (let index = 1; index < totalDataCount.value + 1; index++) {
+        store.dispatch("loadOtherApiData", { index, id });
+      }
+    }
+
+    function getId() {
+      return store.state.currentId;
+    }
 
     function checkCount() {
       if (currentPage.value - 5 <= 0) {
@@ -43,8 +84,6 @@ export default {
       } else {
         stuffCount.value = 0;
       }
-
-      console.log(totalPageCount.value);
 
       if (currentPage.value + 4 >= totalPageCount.value) {
         stuffCount.value = 4 - (totalPageCount.value - currentPage.value);

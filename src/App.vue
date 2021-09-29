@@ -1,9 +1,19 @@
+<script>
+import CategoryBar from "@/components/CategoryBar.vue";
+export default {
+  components: {
+    CategoryBar,
+  },
+};
+</script>
+
 <template>
   <div id="nav">
     <div class="links">
       <router-link to="/">HOME</router-link>
       <router-link to="/Favor">FAVOR</router-link>
     </div>
+    <CategoryBar />
   </div>
   <router-view />
 </template>
@@ -20,6 +30,7 @@ body {
     background-color: #fff;
     border-bottom: 1px solid #0377805e;
     box-shadow: 0px 2px 3px #0377805e;
+    position: relative;
     .links {
       width: 20%;
       height: 100%;
