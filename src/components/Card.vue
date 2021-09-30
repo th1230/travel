@@ -1,27 +1,36 @@
 <script>
 import { ref } from "vue";
+import { useStore } from "vuex";
 export default {
   props: ["data"],
   setup(props) {
     const isOpen = ref(true);
     const data = props.data;
+    const store = useStore();
 
     if (data.images.length == 0) {
       isOpen.value = false;
     }
 
-    return { data, isOpen };
+    async function handClick() {
+      await store.dispatch("setDetailCurrentData", data);
+    }
+
+    return { data, isOpen, handClick };
   },
 };
 </script>
 <template>
   <div class="card">
     <!-- <img :src="data.images[0].src" alt="" /> -->
-    <div
-      v-if="isOpen"
-      class="bg"
-      :style="{ backgroundImage: 'url(' + data.images[0].src + ')' }"
-    ></div>
+
+    <router-link :to="`/detail/${data.id}`" @click="handClick">
+      <div
+        v-if="isOpen"
+        class="bg"
+        :style="{ backgroundImage: 'url(' + data.images[0].src + ')' }"
+      ></div>
+    </router-link>
 
     <div v-if="!isOpen" class="bg noImg"></div>
     <div class="text">

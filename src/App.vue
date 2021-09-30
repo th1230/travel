@@ -1,8 +1,17 @@
 <script>
 import CategoryBar from "@/components/CategoryBar.vue";
+import { useStore } from "vuex";
 export default {
   components: {
     CategoryBar,
+  },
+
+  setup() {
+    const store = useStore();
+    function handClick() {
+      store.dispatch("setCurrentData", []);
+    }
+    return { handClick };
   },
 };
 </script>
@@ -10,7 +19,7 @@ export default {
 <template>
   <div id="nav">
     <div class="links">
-      <router-link to="/">HOME</router-link>
+      <router-link to="/" @click="handClick">HOME</router-link>
       <router-link to="/Favor">FAVOR</router-link>
     </div>
     <CategoryBar />

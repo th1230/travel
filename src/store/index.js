@@ -10,6 +10,7 @@ export default createStore({
     totalNum: 0,
     totalCount: 0,
     currentId: null,
+    detailCurrentData: reactive([]),
 
     categoryOpen: false,
     categoryIdData: [
@@ -53,8 +54,6 @@ export default createStore({
   },
   actions: {
     async getApiData({ commit, state }, { index, id = null }) {
-      console.log(index, id);
-
       if (id != null) {
         state.currentId = id;
       }
@@ -70,13 +69,11 @@ export default createStore({
     },
 
     async loadOtherApiData({ commit, state }, { index, id = null }) {
-      console.log(index, id);
       const res = await apiGetTravelRequest(index, id);
 
       let filterData = res.data.data.filter((item) => item.images.length !== 0);
       await commit("setApiData", filterData);
 
-      console.log(state.viewPoints.length);
       state.totalNum = await state.viewPoints.length;
       state.totalCount = await Math.ceil(state.totalNum / 30);
 
@@ -84,6 +81,8 @@ export default createStore({
         "目前總數=>" + state.totalNum,
         "目前總頁數(30)=>" + state.totalCount
       );
+
+      state.currentId = null;
     },
 
     setCategoryState({ commit }) {
@@ -93,6 +92,19 @@ export default createStore({
     setCurrentData({ commit }, res) {
       console.log(res);
       commit("setCurrentData", res);
+    },
+
+    setCurrentId({ commit }, val) {
+      commit("setCurrentId", val);
+    },
+
+    resetViewPoints({ commit }) {
+      commit("resetViewPoints");
+      return "commit 後";
+    },
+
+    setDetailCurrentData({ commit }, data) {
+      commit("setDetailCurrentData", data);
     },
   },
 
@@ -109,6 +121,19 @@ export default createStore({
       state.currentData = res;
       state.viewPoints = [];
       console.log("第一次設定完畢");
+    },
+
+    setCurrentId(state, val) {
+      state.currentId = val;
+    },
+
+    resetViewPoints(state) {
+      console.log(state.viewPoints);
+      state.viewPoints = reactive([]);
+    },
+
+    setDetailCurrentData(state, data) {
+      state.detailCurrentData = data;
     },
   },
   getters: {
@@ -140,8 +165,36 @@ export default createStore({
       return null;
     },
 
+    getViewPoints: (state) => {
+      return state.viewPoints;
+    },
+
+    getViewPointsById: (state) => (id) => {
+      let data = {};
+      state.viewPoints.forEach((item, vid) => {
+        if (item.id == id) {
+          data = item;
+          return;
+        }
+      });
+
+      return data;
+    },
+
     getTotalNum: (state) => {
       return state.totalNum;
+    },
+
+    getTotalCount: (state) => {
+      return state.totalCount;
+    },
+
+    getCurrentId: (state) => {
+      return state.currentId;
+    },
+
+    getDetailCurrentData: (state) => {
+      return state.detailCurrentData;
     },
   },
 

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "../views/Home.vue";
+import Home from "../views/Home/index.vue";
 import { useStore } from "vuex";
 
 const routes = [
@@ -7,6 +7,12 @@ const routes = [
     path: "/",
     name: "Home",
     component: Home,
+  },
+
+  {
+    path: "/Detail/:id",
+    name: "Detail",
+    component: () => import("../views/Home/detail.vue"),
   },
   {
     path: "/Favor",

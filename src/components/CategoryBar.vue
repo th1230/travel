@@ -16,13 +16,20 @@ export default {
       isOpen.value = store.getters.getCate;
     }
 
+    async function clearData() {
+      if (store.getters.getViewPoints.length != 0) {
+        store.dispatch("resetViewPoints");
+        store.dispatch("setCurrentId", null);
+      }
+    }
+
     function reGetApidata(num, id) {
       store.dispatch("getApiData", { index: num, id: id }).then((res) => {
         store.dispatch("setCurrentData", res);
       });
     }
 
-    return { isOpen, handClick, data, reGetApidata };
+    return { isOpen, handClick, data, reGetApidata, clearData };
   },
 };
 </script>
@@ -32,14 +39,16 @@ export default {
     <CategoryItem @click="handClick()">
       <h1>CATEGORY</h1>
     </CategoryItem>
-    <CategoryItem
-      v-show="isOpen"
-      v-for="item in data"
-      :key="item.id"
-      @click="reGetApidata(1, item.id)"
-    >
-      <h1>{{ item.name }}</h1>
-    </CategoryItem>
+    <router-link to="/" @click="clearData">
+      <CategoryItem
+        v-show="isOpen"
+        v-for="item in data"
+        :key="item.id"
+        @click="reGetApidata(1, item.id)"
+      >
+        <h1>{{ item.name }}</h1>
+      </CategoryItem>
+    </router-link>
   </div>
 </template>
 
@@ -51,6 +60,10 @@ export default {
   z-index: 1000;
   right: 0;
   top: 0;
+  a {
+    text-decoration: none;
+  }
+
   .fade-enter-from {
     opacity: 0;
     height: 0%;

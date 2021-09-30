@@ -1,5 +1,5 @@
 <script>
-import { onMounted, watch, reactive, ref } from "vue";
+import { onMounted, onBeforeMount, watch, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import Card from "@/components/Card.vue";
 import Button from "@/components/Button.vue";
@@ -21,28 +21,39 @@ export default {
     let currentActive = ref(1);
     let stuffCount = ref(0);
 
-    onMounted(() => {
-      store.dispatch("getApiData", { index: 1, id: null }).then((res) => {
-        Data.data = res;
-        totalDataCount.value = store.state.totalCount;
-        totalPageCount.value = Math.ceil(store.state.viewPoints.length / 20);
+    onBeforeMount(() => {
+      store.dispatch("resetViewPoints");
+      store.dispatch("setCurrentId", null);
+    });
 
-        let allButton = document.querySelector(".button");
-        allButton.classList.add("active");
-        loadOtherData();
-      });
+    onMounted(() => {
+      if (store.getters.getCurrentData.length == 0) {
+        store.dispatch("getApiData", { index: 1, id: null }).then((res) => {
+          Data.data = res;
+          totalDataCount.value = store.getters.getTotalCount;
+          totalPageCount.value = Math.ceil(
+            store.getters.getViewPoints.length / 20
+          );
+
+          let allButton = document.querySelector(".button");
+          allButton.classList.add("active");
+          loadOtherData();
+        });
+      }
     });
 
     watch(
       () => store.state.currentData,
       async (newValue, oldValue) => {
         Data.data = store.getters.getCurrentData;
-        totalDataCount.value = store.state.totalCount;
+        totalDataCount.value = store.getters.getTotalCount;
 
-        if (store.state.viewPoints.length <= 20) {
+        if (store.getters.getViewPoints.length <= 20) {
           totalPageCount.value = 1;
         } else {
-          totalPageCount.value = Math.ceil(store.state.viewPoints.length / 20);
+          totalPageCount.value = Math.ceil(
+            store.getters.getViewPoints.length / 20
+          );
         }
 
         let currentId = await getId();
@@ -62,7 +73,9 @@ export default {
         if (store.state.totalNum <= 20) {
           totalPageCount.value = 1;
         } else {
-          totalPageCount.value = Math.ceil(store.state.viewPoints.length / 20);
+          totalPageCount.value = Math.ceil(
+            store.getters.getViewPoints.length / 20
+          );
           console.log(totalPageCount.value);
         }
       }
