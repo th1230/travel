@@ -23,11 +23,13 @@ export default {
 
     onBeforeMount(() => {
       store.dispatch("resetViewPoints");
-      store.dispatch("setCurrentId", null);
     });
 
     onMounted(() => {
-      if (store.getters.getCurrentData.length == 0) {
+      if (
+        store.getters.getCurrentData.length == 0 &&
+        store.getters.getCurrentId == null
+      ) {
         store.dispatch("getApiData", { index: 1, id: null }).then((res) => {
           Data.data = res;
           totalDataCount.value = store.getters.getTotalCount;
@@ -76,7 +78,6 @@ export default {
           totalPageCount.value = Math.ceil(
             store.getters.getViewPoints.length / 20
           );
-          console.log(totalPageCount.value);
         }
       }
     );

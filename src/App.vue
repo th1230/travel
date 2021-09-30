@@ -8,8 +8,9 @@ export default {
 
   setup() {
     const store = useStore();
-    function handClick() {
+    async function handClick() {
       store.dispatch("setCurrentData", []);
+      await store.dispatch("setCurrentId", null);
     }
     return { handClick };
   },

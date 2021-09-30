@@ -1,45 +1,67 @@
 <script>
-import { reactive, ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { reactive, ref, onBeforeMount, watch, onUpdated } from "vue";
 import { useStore } from "vuex";
+import Cookies from "universal-cookie";
+
 export default {
   setup() {
     const store = useStore();
-    let data = reactive([]);
-    const route = useRoute();
-    let intro = reactive([]);
+    let data = reactive({ md: [] });
     const isOpen = ref(false);
+    const cookies = new Cookies();
+    const haveData = ref(false);
+    const curId = cookies.get("curId");
+
+    let intro = reactive({ text: [] });
+
+    window.onload = () => {
+      store
+        .dispatch("getApiData", 1, curId.typeId)
+        .then((res) => store.dispatch("setDetailCurrentData", res[0]));
+    };
+
+    watch(
+      () => store.state.detailCurrentData,
+      (newValue) => {
+        if (newValue.length != 0) {
+          console.log(newValue);
+          data.md = newValue;
+          haveData.value = true;
+          intro.text = data.md.introduction.split("。");
+          intro.text.forEach((item) => item + "。");
+          console.log(intro);
+        } else {
+          haveData.value = false;
+        }
+      },
+      { immediate: true }
+    );
 
     function handClick() {
       isOpen.value = !isOpen.value;
     }
 
-    data = store.getters.getDetailCurrentData;
-
-    intro = data.introduction.split("。");
-    intro = intro.map((item) => {
-      return item + "。";
-    });
-
-    return { data, intro, isOpen, handClick };
+    return { data, isOpen, handClick, haveData, intro };
   },
 };
 </script>
 <template>
-  <div class="detail">
+  <div class="detail" v-if="haveData">
     <div class="main">
       <div class="title">
-        <h1>{{ data.name }}</h1>
+        <h1>{{ data.md.name }}</h1>
       </div>
 
       <div class="image">
-        <img :src="data.images[0].src" alt="" />
+        <img :src="data.md.images[0].src" alt="" />
       </div>
 
       <div :class="['intro', { displayAll: isOpen }]">
         <h1>簡介:</h1>
 
-        <p v-for="text in intro" :key="text" v-html="text"></p>
+        <div v-if="intro != []">
+          <p v-for="text in intro.text" :key="text" v-html="text"></p>
+        </div>
       </div>
 
       <button @click="handClick">
@@ -53,17 +75,17 @@ export default {
         <h1>相關資料</h1>
         <div class="text">
           <h1>Address:</h1>
-          <p>{{ data.address }}</p>
+          <p>{{ data.md.address }}</p>
         </div>
 
         <div class="text">
           <h1>Email:</h1>
-          <p>{{ data.email }}</p>
+          <p>{{ data.md.email }}</p>
         </div>
 
         <div class="text">
           <h1>FaceBook:</h1>
-          <a :href="data.facebook">{{ data.facebook }}</a>
+          <a :href="data.md.facebook">{{ data.md.facebook }}</a>
         </div>
 
         <div class="text">
@@ -73,7 +95,7 @@ export default {
       </div>
 
       <div class="tags">
-        <div class="tag" v-for="tag in data.category" :key="tag">
+        <div class="tag" v-for="tag in data.md.category" :key="tag">
           <p>{{ tag.name }}</p>
         </div>
       </div>
@@ -229,3 +251,5 @@ export default {
   }
 }
 </style>
+
+function newFunction(store) { store.getters.getDetailCurrentData; }

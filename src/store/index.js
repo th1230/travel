@@ -79,10 +79,11 @@ export default createStore({
 
       console.log(
         "目前總數=>" + state.totalNum,
-        "目前總頁數(30)=>" + state.totalCount
+        "目前總頁數(30)=>" + state.totalCount,
+        "目前id=>" + state.currentId
       );
 
-      state.currentId = null;
+      return filterData;
     },
 
     setCategoryState({ commit }) {
@@ -94,7 +95,8 @@ export default createStore({
       commit("setCurrentData", res);
     },
 
-    setCurrentId({ commit }, val) {
+    setCurrentId({ commit, state }, val) {
+      console.log("設定", state.currentId);
       commit("setCurrentId", val);
     },
 
@@ -104,6 +106,7 @@ export default createStore({
     },
 
     setDetailCurrentData({ commit }, data) {
+      console.log(data);
       commit("setDetailCurrentData", data);
     },
   },
@@ -194,7 +197,10 @@ export default createStore({
     },
 
     getDetailCurrentData: (state) => {
-      return state.detailCurrentData;
+      if (state.currentData != null) {
+        return state.detailCurrentData;
+      }
+      return null;
     },
   },
 

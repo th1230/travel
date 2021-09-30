@@ -19,7 +19,6 @@ export default {
     async function clearData() {
       if (store.getters.getViewPoints.length != 0) {
         store.dispatch("resetViewPoints");
-        store.dispatch("setCurrentId", null);
       }
     }
 

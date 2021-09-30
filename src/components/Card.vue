@@ -1,18 +1,24 @@
 <script>
 import { ref } from "vue";
 import { useStore } from "vuex";
+import Cookies from "universal-cookie";
+
 export default {
   props: ["data"],
   setup(props) {
     const isOpen = ref(true);
     const data = props.data;
     const store = useStore();
+    const cookies = new Cookies();
 
     if (data.images.length == 0) {
       isOpen.value = false;
     }
 
-    async function handClick() {
+    async function handClick(data) {
+      let obj = { typeId: data.category[0], itemId: data.id };
+      cookies.set("curId", JSON.stringify(obj));
+
       await store.dispatch("setDetailCurrentData", data);
     }
 
@@ -24,7 +30,7 @@ export default {
   <div class="card">
     <!-- <img :src="data.images[0].src" alt="" /> -->
 
-    <router-link :to="`/detail/${data.id}`" @click="handClick">
+    <router-link :to="`/detail/${data.id}`" @click="handClick(data)">
       <div
         v-if="isOpen"
         class="bg"
