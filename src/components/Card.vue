@@ -1,7 +1,7 @@
 <script>
 import { ref } from "vue";
 import { useStore } from "vuex";
-import Cookies from "universal-cookie";
+import initIndexedDB from "@/indexDB/openDB.js";
 
 export default {
   props: ["data"],
@@ -9,17 +9,32 @@ export default {
     const isOpen = ref(true);
     const data = props.data;
     const store = useStore();
-    const cookies = new Cookies();
-
     if (data.images.length == 0) {
       isOpen.value = false;
     }
 
     async function handClick(data) {
-      let obj = { typeId: data.category[0], itemId: data.id };
-      cookies.set("curId", JSON.stringify(obj));
-
       await store.dispatch("setDetailCurrentData", data);
+      let { openDB, addObject } = initIndexedDB();
+
+      let filterData = {};
+
+      for (let i in data) {
+        if (!Array.isArray(data[i]) && i != "id") {
+          filterData[i] = data[i];
+        }
+      }
+      let Intid = parseInt(data["id"]);
+
+      filterData["category"] = JSON.parse(JSON.stringify({ ...data.category }));
+      filterData["images"] = JSON.parse(JSON.stringify({ ...data.images }));
+      filterData["service"] = JSON.parse(JSON.stringify({ ...data.service }));
+      filterData["target"] = JSON.parse(JSON.stringify({ ...data.target }));
+
+      addObject("travelDataStore", {
+        id: Intid,
+        ...filterData,
+      });
     }
 
     return { data, isOpen, handClick };

@@ -1,23 +1,28 @@
 <script>
-import { reactive, ref, onBeforeMount, watch, onUpdated } from "vue";
+import { reactive, ref, onBeforeMount, watch, onUpdated, onMounted } from "vue";
 import { useStore } from "vuex";
-import Cookies from "universal-cookie";
+import initIndexedDB from "@/indexDB/openDB.js";
+import { useRoute } from "vue-router";
 
 export default {
   setup() {
     const store = useStore();
     let data = reactive({ md: [] });
     const isOpen = ref(false);
-    const cookies = new Cookies();
     const haveData = ref(false);
-    const curId = cookies.get("curId");
+    const { getObject } = initIndexedDB();
+    const route = useRoute();
 
     let intro = reactive({ text: [] });
 
     window.onload = () => {
-      store
-        .dispatch("getApiData", 1, curId.typeId)
-        .then((res) => store.dispatch("setDetailCurrentData", res[0]));
+      let id = parseInt(route.params.id);
+      getObject("travelDataStore", id).then((res) => {
+        data.md = res;
+        console.log(data.md);
+        haveData.value = true;
+        textSet();
+      });
     };
 
     watch(
@@ -27,15 +32,18 @@ export default {
           console.log(newValue);
           data.md = newValue;
           haveData.value = true;
-          intro.text = data.md.introduction.split("。");
-          intro.text.forEach((item) => item + "。");
-          console.log(intro);
+          textSet();
         } else {
           haveData.value = false;
         }
       },
       { immediate: true }
     );
+
+    function textSet() {
+      intro.text = data.md.introduction.split("。");
+      intro.text.forEach((item) => item + "。");
+    }
 
     function handClick() {
       isOpen.value = !isOpen.value;
