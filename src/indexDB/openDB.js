@@ -73,11 +73,8 @@ const initIndexedDB = () => {
         if (typeof id === "undefined") {
           dbRequest = store.getAll();
         } else {
-          console.log(id);
           dbRequest = store.get(id);
         }
-
-        console.log(dbRequest);
 
         dbRequest.onsuccess = (event) => {
           resolve(event.target.result);
@@ -99,11 +96,72 @@ const initIndexedDB = () => {
     return objectPromise;
   };
 
+  const updateObject = (storeName, object) => {
+    const objectPromise = new Promise((resolve, reject) => {
+      const _updateObject = () => {
+        const tranRequest = _db.transaction(storeName, "readwrite");
+
+        let store = tranRequest.objectStore(storeName);
+
+        store.get(object.id).onsuccess = (event) => {
+          let newArr = addOrRemove(event.target.result.arr, object.arr[0]);
+          const newObject = { id: object.id, arr: newArr };
+
+          tranRequest.objectStore(storeName).put(newObject).onsuccess = (
+            event
+          ) => {
+            if (config.debug) {
+              console.log("updateObject ", event);
+            }
+            resolve(event.target.result);
+          };
+        };
+
+        tranRequest.onerror = (event) => {
+          reject(event);
+        };
+      };
+      if (typeof _db === "undefined") {
+        openDB().then(() => {
+          _updateObject();
+        });
+      } else {
+        _updateObject();
+      }
+    });
+    return objectPromise;
+  };
+
   return {
     openDB,
     addObject,
     getObject,
+    updateObject,
   };
 };
+
+function addOrRemove(array, value) {
+  let index;
+  let newArr = [];
+
+  newArr = newArr.concat(array);
+
+  if (newArr.length == 0) {
+    index = -1;
+  } else {
+    for (let i = 0; i < newArr.length; i++) {
+      index = newArr[i].id == value.id ? i : -1;
+    }
+  }
+
+  console.log(index);
+
+  if (index === -1) {
+    newArr.push(value);
+  } else {
+    newArr.splice(index, 1);
+  }
+  return newArr;
+}
 
 export default initIndexedDB;
