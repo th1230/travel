@@ -258,4 +258,18 @@ export default {
     }
   }
 }
+
+@media screen and(max-width: 1024px) {
+  .detail {
+    flex-direction: column;
+    align-items: center;
+    .main {
+      width: 70%;
+    }
+    .aside {
+      margin: 5% 0;
+      width: 70%;
+    }
+  }
+}
 </style>

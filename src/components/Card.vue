@@ -125,7 +125,7 @@ export default {
 </template>
 <style lang="scss" scoped>
 .card {
-  height: 400px;
+  height: 300px;
   min-width: 22%;
   margin-bottom: 30px;
   border: 2px solid rgba(128, 128, 128, 0.452);
@@ -145,14 +145,20 @@ export default {
     box-shadow: 0px 0px 20px 30px rgba(128, 128, 128, 0.137);
   }
 
-  .bg {
-    width: 100%;
-    height: 50%;
-    background-size: cover;
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
-    position: relative;
-    background-color: rgb(179, 179, 179);
+  a {
+    .bg {
+      width: 100%;
+      height: 60%;
+      background-size: cover;
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+      position: relative;
+      background-color: rgb(179, 179, 179);
+      transition: 0.2s;
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
   }
 
   .text {
@@ -163,13 +169,20 @@ export default {
     }
   }
 
-  button {
+  .star {
     position: absolute;
     bottom: 0;
     right: 0;
+    border: none;
+    background-color: initial;
+    transition: 0.3s;
     img {
       width: 32px;
       height: 32px;
+    }
+
+    &:hover {
+      transform: rotate(360deg);
     }
   }
 }

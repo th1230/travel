@@ -54,12 +54,12 @@ export default createStore({
   },
   actions: {
     async getApiData({ commit, state }, { index, id = null }) {
-      console.log(id);
       if (id != null) {
         state.currentId = id;
       }
 
       const res = await apiGetTravelRequest(index, id);
+      console.log(res);
 
       state.totalNum = await res.data.total;
       state.totalCount = await Math.ceil(state.totalNum / 30);
@@ -69,8 +69,11 @@ export default createStore({
       return filterData.slice(0, 20);
     },
 
-    async loadOtherApiData({ commit, state }, { index, id = null }) {
-      const res = await apiGetTravelRequest(index, id);
+    async loadOtherApiData(
+      { commit, state },
+      { index, id = null, cancel = false }
+    ) {
+      const res = await apiGetTravelRequest(index, id, cancel);
 
       let filterData = res.data.data.filter((item) => item.images.length !== 0);
       await commit("setApiData", filterData);

@@ -1,5 +1,12 @@
 <script>
-import { onMounted, onBeforeMount, watch, reactive, ref } from "vue";
+import {
+  onMounted,
+  onBeforeMount,
+  watch,
+  reactive,
+  ref,
+  onUnmounted,
+} from "vue";
 import { useStore } from "vuex";
 import Card from "@/components/Card.vue";
 import Button from "@/components/Button.vue";
@@ -16,6 +23,7 @@ export default {
     const Data = reactive({ data: [] });
     const totalDataCount = ref(0);
     const totalPageCount = ref(0);
+    const cancelRequest = ref(false);
 
     let currentPage = ref(1);
     let currentActive = ref(1);
@@ -23,6 +31,7 @@ export default {
 
     onBeforeMount(() => {
       store.dispatch("resetViewPoints");
+      cancelRequest.value = false;
     });
 
     onMounted(() => {
@@ -31,6 +40,7 @@ export default {
         store.getters.getCurrentId == null
       ) {
         store.dispatch("getApiData", { index: 1, id: null }).then((res) => {
+          console.log(res);
           Data.data = res;
           totalDataCount.value = store.getters.getTotalCount;
           totalPageCount.value = Math.ceil(
@@ -42,6 +52,10 @@ export default {
           loadOtherData();
         });
       }
+    });
+
+    onUnmounted(() => {
+      cancelRequest.value = true;
     });
 
     watch(
@@ -87,8 +101,11 @@ export default {
 
     function loadOtherData(id = null) {
       for (let index = 1; index < totalDataCount.value + 1; index++) {
-        console.log(index);
-        store.dispatch("loadOtherApiData", { index, id });
+        store.dispatch("loadOtherApiData", {
+          index,
+          id,
+          cancel: cancelRequest.value,
+        });
       }
     }
 
@@ -220,13 +237,6 @@ export default {
   .next-blk {
     display: flex;
     margin: 0 5px;
-  }
-}
-
-@media screen and(max-width: 768px) {
-  .home {
-    .cards {
-    }
   }
 }
 
