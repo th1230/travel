@@ -42,4 +42,19 @@ export default {};
     background-color: #2cb0b9;
   }
 }
+@media screen and(max-width: 768px) {
+  .categoryitem {
+    h1 {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+@media screen and(max-width: 420px) {
+  .categoryitem {
+    h1 {
+      font-size: 0.2rem;
+    }
+  }
+}
 </style>

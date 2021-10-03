@@ -141,26 +141,28 @@ const initIndexedDB = () => {
 };
 
 function addOrRemove(array, value) {
-  let index;
+  let index = -1;
   let newArr = [];
 
   newArr = newArr.concat(array);
 
   if (newArr.length == 0) {
-    index = -1;
+    newArr.push(value);
   } else {
     for (let i = 0; i < newArr.length; i++) {
-      index = newArr[i].id == value.id ? i : -1;
+      if (newArr[i].id == value.id) {
+        console.log(i);
+        index = i;
+      }
+    }
+
+    if (index == -1) {
+      newArr.push(value);
+    } else {
+      newArr.splice(index, 1);
     }
   }
 
-  console.log(index);
-
-  if (index === -1) {
-    newArr.push(value);
-  } else {
-    newArr.splice(index, 1);
-  }
   return newArr;
 }
 

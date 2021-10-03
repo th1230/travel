@@ -259,5 +259,3 @@ export default {
   }
 }
 </style>
-
-function newFunction(store) { store.getters.getDetailCurrentData; }

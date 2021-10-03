@@ -33,4 +33,11 @@ export default {
     box-shadow: 0px 3px 2px #01466988;
   }
 }
+
+@media screen and(max-width: 376px) {
+  .changepagebtn {
+    width: 35px;
+    height: 35px;
+  }
+}
 </style>

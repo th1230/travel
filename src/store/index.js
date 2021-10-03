@@ -54,6 +54,7 @@ export default createStore({
   },
   actions: {
     async getApiData({ commit, state }, { index, id = null }) {
+      console.log(id);
       if (id != null) {
         state.currentId = id;
       }
@@ -62,7 +63,7 @@ export default createStore({
 
       state.totalNum = await res.data.total;
       state.totalCount = await Math.ceil(state.totalNum / 30);
-
+      console.log(state.totalCount);
       let filterData = res.data.data.filter((item) => item.images.length !== 0);
 
       return filterData.slice(0, 20);

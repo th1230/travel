@@ -126,12 +126,12 @@ export default {
 <style lang="scss" scoped>
 .card {
   height: 400px;
+  min-width: 22%;
   margin-bottom: 30px;
   border: 2px solid rgba(128, 128, 128, 0.452);
   border-radius: 5px;
   overflow: hidden;
   box-sizing: border-box;
-  margin-right: 5%;
   flex-basis: 20%;
   transition: 0.3s;
   cursor: pointer;
@@ -139,6 +139,7 @@ export default {
     0px 0px 5px 10px rgba(128, 128, 128, 0.137);
 
   position: relative;
+
   &:hover {
     transform: perspective(300px) translateZ(10px);
     box-shadow: 0px 0px 20px 30px rgba(128, 128, 128, 0.137);
@@ -170,6 +171,18 @@ export default {
       width: 32px;
       height: 32px;
     }
+  }
+}
+
+@media screen and(max-width: 768px) {
+  .card {
+    min-width: 40%;
+  }
+}
+
+@media screen and(max-width: 376px) {
+  .card {
+    min-width: 90%;
   }
 }
 </style>

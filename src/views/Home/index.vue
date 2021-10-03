@@ -49,6 +49,7 @@ export default {
       async (newValue, oldValue) => {
         Data.data = store.getters.getCurrentData;
         totalDataCount.value = store.getters.getTotalCount;
+        console.log(Data.data);
 
         if (store.getters.getViewPoints.length <= 20) {
           totalPageCount.value = 1;
@@ -66,6 +67,7 @@ export default {
 
         await loadOtherData(currentId);
       },
+      { immediate: true },
       { deep: true }
     );
 
@@ -79,11 +81,13 @@ export default {
             store.getters.getViewPoints.length / 20
           );
         }
-      }
+      },
+      { immediate: true }
     );
 
     function loadOtherData(id = null) {
       for (let index = 1; index < totalDataCount.value + 1; index++) {
+        console.log(index);
         store.dispatch("loadOtherApiData", { index, id });
       }
     }
@@ -197,10 +201,10 @@ export default {
   width: 100%;
   .cards {
     width: 100%;
-    padding: 10%;
+    padding: 5%;
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: space-around;
     align-items: center;
     box-sizing: border-box;
   }
@@ -216,6 +220,29 @@ export default {
   .next-blk {
     display: flex;
     margin: 0 5px;
+  }
+}
+
+@media screen and(max-width: 768px) {
+  .home {
+    .cards {
+    }
+  }
+}
+
+@media screen and(max-width: 420px) {
+  .home {
+    .prev-blk {
+      :nth-child(1) {
+        display: none;
+      }
+    }
+
+    .next-blk {
+      :nth-child(2) {
+        display: none;
+      }
+    }
   }
 }
 </style>

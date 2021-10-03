@@ -34,4 +34,11 @@ export default {
     box-shadow: 0px 3px 2px rgba(102, 102, 102, 0.452);
   }
 }
+
+@media screen and(max-width: 376px) {
+  .button {
+    min-width: 30px;
+    min-height: 30px;
+  }
+}
 </style>

@@ -91,4 +91,10 @@ export default {
     transition: opacity 0.5s ease, height 0.5s;
   }
 }
+
+@media screen and(max-width: 376px) {
+  .categorybar {
+    width: 30%;
+  }
+}
 </style>

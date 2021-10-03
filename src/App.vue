@@ -9,8 +9,10 @@ export default {
   setup() {
     const store = useStore();
     async function handClick() {
-      store.dispatch("setCurrentData", []);
       await store.dispatch("setCurrentId", null);
+      store.dispatch("getApiData", { index: 1, id: null }).then((res) => {
+        store.dispatch("setCurrentData", res);
+      });
     }
     return { handClick };
   },
@@ -34,6 +36,7 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
+  overflow-x: hidden;
   #nav {
     width: 100%;
     height: 70px;
@@ -51,7 +54,7 @@ body {
 
       a {
         display: flex;
-        width: 100%;
+        width: 50%;
         height: 100%;
         justify-content: center;
         align-items: center;
@@ -65,6 +68,36 @@ body {
           background-color: #01aebb;
           color: white;
           border-right: 2px solid #1aa5af;
+        }
+      }
+    }
+  }
+}
+
+@media screen and(max-width: 768px) {
+  html,
+  body {
+    #nav {
+      height: 40px;
+      .links {
+        width: 40%;
+        a {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+@media screen and(max-width: 420px) {
+  html,
+  body {
+    #nav {
+      height: 40px;
+      .links {
+        width: 40%;
+        a {
+          font-size: 0.2rem;
         }
       }
     }
