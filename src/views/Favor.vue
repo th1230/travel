@@ -2,20 +2,31 @@
 import { onBeforeMount, reactive, ref } from "vue";
 import initIndexedDB from "@/indexDB/openDB.js";
 import { Field, Form, ErrorMessage } from "vee-validate";
-
+import Button from "@/components/Button.vue";
+import ChangePageBtn from "@/components/ChangePageBtn.vue";
+import { useRouter } from "vue-router";
 export default {
   components: {
     Field,
     Form,
     ErrorMessage,
+    ChangePageBtn,
+    Button,
   },
+
   setup() {
     const write = ref(true);
     const havedata = ref(false);
     const sendDataError = ref(true);
-
     const data = reactive({ val: [] });
+    const router = useRouter();
     let { openDB, addObject, getObject, updateObject } = initIndexedDB();
+    const showSt = ref(0);
+    const showEd = ref(0);
+    const pages = ref(0);
+    const active = ref(1);
+    const curPage = ref(1);
+
     onBeforeMount(() => {
       getObject("travelDataStore", 0).then((res) => {
         if (res.arr.length != 0) {
@@ -27,6 +38,8 @@ export default {
           }
           havedata.value = true;
         }
+
+        showRange(curPage.value);
       });
     });
 
@@ -146,6 +159,45 @@ export default {
       }
     }
 
+    function showRange(n) {
+      pages.value = Math.ceil(data.val.length / 5);
+      curPage.value = n;
+      showSt.value = (n - 1) * 5;
+      if (data.val.length % 5 != 0 && pages.value == n) {
+        showEd.value = data.val.length;
+      } else {
+        showEd.value = n * 5;
+      }
+    }
+
+    function setActive(num) {
+      active.value = num;
+      showRange(num);
+    }
+
+    function clickButton(str) {
+      if (str == "+") {
+        curPage.value++;
+      } else if (str == "-") {
+        curPage.value--;
+      } else if (str == "--") {
+        curPage.value = 1;
+      } else if (str == "++") {
+        curPage.value = pages.value;
+      }
+
+      if (curPage.value > pages.value) {
+        curPage.value = pages.value;
+      } else if (curPage.value < 1) {
+        curPage.value = 1;
+      }
+
+      showRange(curPage.value);
+    }
+
+    function routeChange(id) {
+      router.push(`/detail/${id}`);
+    }
     return {
       data,
       changeCanORCantInput,
@@ -155,6 +207,14 @@ export default {
       sendFavorEdit,
       nameValidate,
       telValidate,
+      showSt,
+      showEd,
+      pages,
+      showRange,
+      setActive,
+      clickButton,
+      curPage,
+      routeChange,
     };
   },
 };
@@ -164,8 +224,13 @@ export default {
   <div class="about">
     <div class="block">目前收藏</div>
     <div class="cards" v-if="havedata">
-      <div class="card" v-for="(item, uid) in data.val" :key="item.id">
-        <img :src="item.data.img" alt="" />
+      <div
+        class="card"
+        v-for="(item, uid) in data.val"
+        :key="item.id"
+        v-show="uid < showEd && uid >= showSt"
+      >
+        <img :src="item.data.img" alt="" @click="routeChange(item.id)" />
         <Form>
           <div class="inputBox">
             <label for="">名稱:</label>
@@ -204,6 +269,24 @@ export default {
             送出
           </button>
         </div>
+      </div>
+    </div>
+
+    <div class="page-bar">
+      <div class="prev-blk">
+        <ChangePageBtn @click="clickButton('--')">&laquo;</ChangePageBtn>
+        <ChangePageBtn @click="clickButton('-')">&#8249;</ChangePageBtn>
+      </div>
+      <Button
+        v-for="item in pages"
+        :key="item"
+        @click="showRange(item)"
+        :num="item"
+        :class="{ active: item == curPage }"
+      />
+      <div class="next-blk">
+        <ChangePageBtn @click="clickButton('+')">&#8250;</ChangePageBtn>
+        <ChangePageBtn @click="clickButton('++')">&raquo;</ChangePageBtn>
       </div>
     </div>
 
@@ -254,6 +337,7 @@ export default {
         width: 70%;
         object-fit: cover;
         border-radius: 5px;
+        cursor: pointer;
       }
       form {
         padding: 10px 0;
@@ -359,6 +443,19 @@ export default {
         }
       }
     }
+  }
+
+  .page-bar {
+    display: flex;
+    width: 100%;
+    height: 100px;
+    align-items: center;
+    justify-content: center;
+  }
+  .prev-blk,
+  .next-blk {
+    display: flex;
+    margin: 0 5px;
   }
 
   .text {

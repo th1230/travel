@@ -64,6 +64,30 @@ const initIndexedDB = () => {
     return objectPromise;
   };
 
+  const deleteObject = (storeName, id) => {
+    const objectPromise = new Promise((resolve, reject) => {
+      const _deleteObject = () => {
+        const tranRequest = _db.transaction(storeName, "readwrite");
+        let store = tranRequest.objectStore(storeName);
+        store.delete(id).onsuccess = (event) => {
+          resolve(event.target.result);
+        };
+        tranRequest.onerror = (event) => {
+          reject(event);
+        };
+      };
+
+      if (typeof _db === "undefined") {
+        openDB().then(() => {
+          _deleteObject();
+        });
+      } else {
+        _deleteObject();
+      }
+    });
+    return objectPromise;
+  };
+
   const getObject = (storeName, id) => {
     const objectPromise = new Promise((resolve, reject) => {
       const _getObject = () => {
@@ -137,6 +161,7 @@ const initIndexedDB = () => {
     addObject,
     getObject,
     updateObject,
+    deleteObject,
   };
 };
 

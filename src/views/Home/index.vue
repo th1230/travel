@@ -6,6 +6,7 @@ import {
   reactive,
   ref,
   onUnmounted,
+  computed,
 } from "vue";
 import { useStore } from "vuex";
 import Card from "@/components/Card.vue";
@@ -27,7 +28,7 @@ export default {
 
     let currentPage = ref(1);
     let currentActive = ref(1);
-    let stuffCount = ref(0);
+    let stuffCount = ref(2);
 
     onBeforeMount(() => {
       store.dispatch("resetViewPoints");
@@ -40,7 +41,6 @@ export default {
         store.getters.getCurrentId == null
       ) {
         store.dispatch("getApiData", { index: 1, id: null }).then((res) => {
-          console.log(res);
           Data.data = res;
           totalDataCount.value = store.getters.getTotalCount;
           totalPageCount.value = Math.ceil(
@@ -63,7 +63,6 @@ export default {
       async (newValue, oldValue) => {
         Data.data = store.getters.getCurrentData;
         totalDataCount.value = store.getters.getTotalCount;
-        console.log(Data.data);
 
         if (store.getters.getViewPoints.length <= 20) {
           totalPageCount.value = 1;
@@ -113,67 +112,73 @@ export default {
       return store.state.currentId;
     }
 
-    function checkCount() {
-      if (currentPage.value - 5 <= 0) {
-        stuffCount.value = currentPage.value - 2;
-      } else {
-        stuffCount.value = 0;
-      }
+    function getNewPagData() {
+      Data.data = store.getters.getData(currentPage.value);
+    }
 
-      if (currentPage.value + 4 >= totalPageCount.value) {
-        stuffCount.value = 4 - (totalPageCount.value - currentPage.value);
+    function checkCount() {
+      if (currentPage.value < 3) {
+        stuffCount.value = currentPage.value == 2 ? 1 : 0;
+      } else if (currentPage.value + 2 > totalPageCount.value) {
+        stuffCount.value = totalPageCount.value == currentPage.value ? 4 : 3;
       } else {
-        stuffCount.value = 0;
+        stuffCount.value = 2;
       }
     }
 
-    function handClick(num, e) {
-      Data.data = store.getters.getData(num);
-
+    function handClick(num, func) {
       currentPage.value = num;
       checkCount();
+
+      func();
     }
 
-    function addActive(num, e) {
+    function addActive(num, func) {
       currentActive.value = num;
-      handClick(num, e);
+      handClick(num, func);
     }
 
-    function addPage() {
+    function addPage(func) {
       if (currentPage.value == totalPageCount.value) {
         console.log("最後一頁");
+        currentPage.value == totalPageCount.value;
         return;
       }
-
-      checkCount();
 
       currentPage.value++;
-      Data.data = store.getters.getData(currentPage.value);
       currentActive.value++;
+      func();
+
+      checkCount();
     }
 
-    function reducePage() {
+    function reducePage(func) {
       if (currentPage.value == 1) {
         console.log("第一頁");
+        currentPage.value == 1;
         return;
       }
 
-      checkCount();
-
       currentPage.value--;
-      Data.data = store.getters.getData(currentPage.value);
       currentActive.value--;
+      func();
+
+      checkCount();
     }
+
+    const transform = computed(() => {
+      return -stuffCount.value + currentPage.value - 1;
+    });
 
     return {
       Data,
       handClick,
       addActive,
-      currentPage,
       currentActive,
-      stuffCount,
       addPage,
       reducePage,
+      transform,
+      getNewPagData,
       totalPageCount,
     };
   },
@@ -187,25 +192,26 @@ export default {
 
     <div class="page-bar">
       <div class="prev-blk">
-        <ChangePageBtn @click="addActive(1, $event)">&laquo;</ChangePageBtn>
-        <ChangePageBtn @click="reducePage">&#8249;</ChangePageBtn>
+        <ChangePageBtn @click="addActive(1, getNewPagData)"
+          >&laquo;</ChangePageBtn
+        >
+        <ChangePageBtn @click="reducePage(getNewPagData)"
+          >&#8249;</ChangePageBtn
+        >
       </div>
       <Button
         v-for="item in 5"
-        @click="addActive(item - stuffCount + currentPage - 1, $event)"
+        @click="addActive(item + transform, getNewPagData)"
         :class="{
-          active: currentActive == item - stuffCount + currentPage - 1,
+          active: currentActive == item + transform,
         }"
-        :key="item - stuffCount + currentPage - 1"
-        :num="item - stuffCount + currentPage - 1"
-        v-show="
-          !(item - stuffCount + currentPage - 1 > totalPageCount) &&
-            !(item - stuffCount + currentPage - 1 < 1)
-        "
+        :key="item + transform"
+        :num="item + transform"
+        v-show="!(item + transform > totalPageCount) && !(item + transform < 1)"
       />
       <div class="next-blk">
-        <ChangePageBtn @click="addPage">&#8250;</ChangePageBtn>
-        <ChangePageBtn @click="addActive(totalPageCount, $event)"
+        <ChangePageBtn @click="addPage(getNewPagData)">&#8250;</ChangePageBtn>
+        <ChangePageBtn @click="addActive(totalPageCount, getNewPagData)"
           >&raquo;</ChangePageBtn
         >
       </div>

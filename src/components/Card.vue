@@ -6,7 +6,13 @@ import initIndexedDB from "@/indexDB/openDB.js";
 export default {
   props: ["data"],
   setup(props) {
-    let { openDB, addObject, getObject, updateObject } = initIndexedDB();
+    let {
+      openDB,
+      addObject,
+      getObject,
+      updateObject,
+      deleteObject,
+    } = initIndexedDB();
     const isOpen = ref(true);
     const data = props.data;
     const store = useStore();
@@ -57,7 +63,7 @@ export default {
       });
     }
 
-    function handLike() {
+    function handLike(data) {
       islike.value = !islike.value;
 
       getObject("travelDataStore", 0).then((res) => {
@@ -78,6 +84,9 @@ export default {
         } else {
           console.log("有資料");
 
+          let Intid = parseInt(data["id"]);
+          deleteObject("travelDataStore", Intid);
+
           updateObject("travelDataStore", {
             id: 0,
             arr: [
@@ -93,6 +102,8 @@ export default {
           });
         }
       });
+
+      handClick(data, "star");
     }
 
     return { data, isOpen, handClick, handLike, islike };
@@ -117,7 +128,7 @@ export default {
       <p></p>
     </div>
 
-    <button class="star" @click="handLike">
+    <button class="star" @click="handLike(data)">
       <img v-show="islike" src="@/assets/star.png" alt="" />
       <img v-show="!islike" src="@/assets/star_close.png" alt="" />
     </button>

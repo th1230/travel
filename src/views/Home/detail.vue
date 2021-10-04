@@ -15,6 +15,16 @@ export default {
 
     let intro = reactive({ text: [] });
 
+    onMounted(() => {
+      let id = parseInt(route.params.id);
+      getObject("travelDataStore", id).then((res) => {
+        data.md = res;
+        console.log(data.md);
+        haveData.value = true;
+        textSet();
+      });
+    });
+
     window.onload = () => {
       let id = parseInt(route.params.id);
       getObject("travelDataStore", id).then((res) => {

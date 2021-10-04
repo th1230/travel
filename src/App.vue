@@ -1,17 +1,22 @@
 <script>
 import CategoryBar from "@/components/CategoryBar.vue";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+
 export default {
   components: {
     CategoryBar,
   },
 
   setup() {
+    const router = useRouter();
     const store = useStore();
     async function handClick() {
       await store.dispatch("setCurrentId", null);
       store.dispatch("getApiData", { index: 1, id: null }).then((res) => {
-        store.dispatch("setCurrentData", res);
+        store.dispatch("setCurrentData", res).then(() => {
+          router.push("/");
+        });
       });
     }
     return { handClick };
@@ -22,7 +27,7 @@ export default {
 <template>
   <div id="nav">
     <div class="links">
-      <router-link to="/" @click="handClick">HOME</router-link>
+      <a @click.prevent="handClick">HOME</a>
       <router-link to="/Favor">FAVOR</router-link>
     </div>
     <CategoryBar />

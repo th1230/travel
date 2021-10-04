@@ -59,11 +59,11 @@ export default createStore({
       }
 
       const res = await apiGetTravelRequest(index, id);
-      console.log(res);
+      // console.log(res);
 
       state.totalNum = await res.data.total;
       state.totalCount = await Math.ceil(state.totalNum / 30);
-      console.log(state.totalCount);
+      // console.log(state.totalCount);
       let filterData = res.data.data.filter((item) => item.images.length !== 0);
 
       return filterData.slice(0, 20);
@@ -81,11 +81,11 @@ export default createStore({
       state.totalNum = await state.viewPoints.length;
       state.totalCount = await Math.ceil(state.totalNum / 30);
 
-      console.log(
-        "目前總數=>" + state.totalNum,
-        "目前總頁數(30)=>" + state.totalCount,
-        "目前id=>" + state.currentId
-      );
+      // console.log(
+      //   "目前總數=>" + state.totalNum,
+      //   "目前總頁數(30)=>" + state.totalCount,
+      //   "目前id=>" + state.currentId
+      // );
 
       return filterData;
     },
@@ -97,6 +97,9 @@ export default createStore({
     setCurrentData({ commit }, res) {
       console.log(res);
       commit("setCurrentData", res);
+      return new Promise((resolve, reject) => {
+        resolve("修改完成");
+      });
     },
 
     setCurrentId({ commit, state }, val) {
@@ -110,7 +113,7 @@ export default createStore({
     },
 
     setDetailCurrentData({ commit }, data) {
-      console.log(data);
+      // console.log(data);
       commit("setDetailCurrentData", data);
     },
   },
@@ -135,7 +138,7 @@ export default createStore({
     },
 
     resetViewPoints(state) {
-      console.log(state.viewPoints);
+      // console.log(state.viewPoints);
       state.viewPoints = reactive([]);
     },
 
